@@ -1,12 +1,11 @@
-import express, {Express} from 'express';
+import express, {Express, Router} from 'express';
 import cors from 'cors';
 import 'express-async-errors';
-import UserRouter from './Routes/Users';
-
+import UserRouter from './routes/Users';
 
 export class App {
-	
-	constructor(public app: Express) {
+
+	constructor(public app: Express, public router: Router) {
 		this.config();
 		this.useRoutes();
 	}
@@ -17,15 +16,15 @@ export class App {
 	}
 
 	public useRoutes() {
-		const user = new UserRouter();
+		const user = new UserRouter(this.router);
 		this.app.use('/users/', user.router);
 	}
 	
-	public async start(PORT:string) {
+	public async start(PORT:number) {
 		this.app.listen(PORT, () => (
 			console.log(`Running at port ${PORT}`)
 		));
 	}
 }
 
-export const app = new App(express()); 
+export const app = new App(express(), Router());
