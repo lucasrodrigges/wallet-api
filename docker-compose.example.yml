@@ -1,0 +1,50 @@
+version: '3'
+
+services:
+  backend:
+    container_name: wallet_api
+    build: ./
+    ports:
+      - 8080:8080
+    platform: linux/x86_64
+    working_dir: /app-backend
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - wallet_net
+    environment:
+      - MYSQLHOST=<>
+      - MYSQLPORT=<>
+      - MYSQLUSER=<>
+      - MYSQLPASSWORD=<>
+      - MYSQLDATABASE=<>
+      - SERVER_PORT=<>
+      - JWT_SECRET=<>
+    volumes:
+      - ./:/app-backend/
+    healthcheck:
+      test: [ "CMD", "lsof", "-t", "-i:8080" ]         
+      timeout: 10s
+      retries: 5
+  db:
+    image: mysql:8.0.23
+    container_name: wallet_db
+    # platform: linux/x86_64
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=<>
+    networks:
+      - wallet_net
+    restart: 'always'
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"] # Deve aguardar o banco ficar operacional
+      timeout: 10s
+      retries: 5
+    cap_add:
+      - SYS_NICE # Deve omitir alertas menores
+
+networks:
+  wallet_net:
+    driver: bridge
