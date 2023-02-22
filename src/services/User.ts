@@ -1,15 +1,43 @@
+import ILogin from '../interfaces/ILogin';
 import { type IUser } from '../interfaces/IUser';
-import User from '../database/models/User';
+import User from '../models/User';
+import { encryptPassword, verifyPassword } from '../utils/bcrypt';
+import HTTPError from '../utils/HTTPError';
+import { createToken } from '../utils/JWT';
+import responseList from '../utils/responseList';
 
 export default class UserService {
+  static async login(payload: ILogin) {
+    const foundUser = await User.login(payload);
+
+    if (!foundUser) throw new HTTPError(404, responseList.NOT_FOUND);
+    if (!await verifyPassword(payload.password, foundUser.password)) {
+      throw new HTTPError(422, responseList.INVALID_VALUES);
+    }
+
+    const token = createToken({ userId: foundUser.id });
+
+    return { token };
+  }
+
   static async findAll() {
     const users = await User.findAll();
+
+    if (!users.length) throw new HTTPError(404, responseList.NOT_FOUND);
+
     return users;
   }
 
   static async create(payload: IUser) {
-    const created = await User.create({ ...payload });
-    console.log(created);
-    return created;
+    const hash = await encryptPassword(payload.password);
+    const created = await User.create({ ...payload, password: hash });
+
+    return { message: responseList.CREATED };
+  }
+
+  static async remove(userId: string) {
+    const deleted = await User.remove(userId);
+
+    return responseList.OK;
   }
 }

@@ -1,41 +1,18 @@
-import {type DataTypes, type QueryInterface} from 'sequelize';
+import { Knex } from 'knex';
 
-export default {
-	async up(queryInterface: QueryInterface, Sequelize: typeof DataTypes) {
-		await queryInterface.createTable('Users', {
-			id: {
-				primaryKey: true,
-				type: Sequelize.UUID,
-				defaultValue: Sequelize.UUIDV4,
-			},
-			name: {
-				type: Sequelize.STRING,
-				allowNull: false,
-			},
-			email: {
-				type: Sequelize.STRING,
-				allowNull: false,
-			},
-			password: {
-				type: Sequelize.STRING,
-				allowNull: false,
-			},
-			deletedAt: {
-				type: Sequelize.DATE,
-				allowNull: true,
-			},
-			createdAt: {
-				type: Sequelize.DATE,
-				defaultValue: Sequelize.DATE,
-			},
-			updatedAt: {
-				type: Sequelize.DATE,
-				defaultValue: Sequelize.DATE,
-			},
-		});
-	},
+export async function up(knex: Knex): Promise<void> {
+  await knex.schema.createTable('Users', (table) => {
+    table.uuid('id').defaultTo(knex.raw('(UUID())'));
+    table.string('name').notNullable();
+    table.string('username');
+    table.string('email').notNullable();
+    table.string('password').notNullable();
+    table.date('createdAt').defaultTo(knex.raw('(NOW())'));
+    table.date('updatedAt').defaultTo(knex.raw('(NOW())'));
+    table.date('deletedAt');
+  });
+}
 
-	async down(queryInterface: QueryInterface) {
-		await queryInterface.dropTable('Users');
-	},
-};
+export async function down(knex: Knex): Promise<void> {
+  await knex.schema.dropTable('Users');
+}
