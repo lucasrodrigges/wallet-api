@@ -6,7 +6,6 @@ export = {
     user: process.env.MYSQLUSER as string,
     password: process.env.MYSQLPASSWORD as string,
     database: process.env.MYSQLDATABASE as string,
-    createDatabase: true,
   },
   pool: { min: 0, max: 10 },
   migrations: {

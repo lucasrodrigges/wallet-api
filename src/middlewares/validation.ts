@@ -1,16 +1,14 @@
 import { type NextFunction, type Request, type Response } from 'express';
 import Joi from 'joi';
-import HTTPError from '../utils/HTTPError';
 
 export = (schema: Joi.Schema, isQuery = false) => (
   req: Request,
-  _res: Response,
+  res: Response,
   next: NextFunction,
 ) => {
   const payload = isQuery ? req.query : req.body;
   const { error } = schema.validate(payload);
-  console.log('joi', error || 'validated');
-  if (error) throw new HTTPError(422, error.message);
 
-  next();
+  if (error) res.status(422).json({ message: error.message });
+  else next();
 };
