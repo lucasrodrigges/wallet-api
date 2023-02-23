@@ -11,6 +11,15 @@ export default class UserModel {
     return users;
   }
 
+  static async findByEmail(email: string) {
+    const user = await Knex
+      .select('*')
+      .from('Users')
+      .where('email', email);
+
+    return user;
+  }
+
   static async login({ email, password }: ILogin) {
     const user = await Knex
       .select('*')

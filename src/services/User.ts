@@ -30,6 +30,9 @@ export default class UserService {
 
   static async create(payload: IUser) {
     const hash = await encryptPassword(payload.password);
+    const userExists = await User.findByEmail(payload.email);
+
+    if (userExists) throw new HTTPError(422, 'User already exists.');
     const created = await User.create({ ...payload, password: hash });
 
     return { message: responseList.CREATED };

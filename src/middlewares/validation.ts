@@ -1,7 +1,6 @@
 import { type NextFunction, type Request, type Response } from 'express';
 import Joi from 'joi';
 import HTTPError from '../utils/HTTPError';
-import responseList from '../utils/responseList';
 
 export = (schema: Joi.Schema, isQuery = false) => (
   req: Request,

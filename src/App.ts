@@ -1,6 +1,5 @@
 import express, { Express, Router } from 'express';
 import cors from 'cors';
-import 'express-async-errors';
 import knex from './database/config';
 import UserRouter from './routes/Users';
 
